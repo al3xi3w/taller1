@@ -105,6 +105,6 @@ app.delete("/tasks/:id", (req, res) => {
 });
 
 /* ---------------------- ARRANQUE ---------------------- */
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`API corriendo en http://0.0.0.0:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://0.0.0.0:${PORT}`);
 });
