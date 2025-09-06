@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 // DB connection (crea el archivo si no existe)
-const db = new sqlite3.Database("./taller1.db", (err) => {
+const db = new sqlite3.Database("./database.db", (err) => {
   if (err) {
     console.error("Error al abrir la base de datos:", err.message);
   } else {
@@ -25,6 +25,7 @@ const db = new sqlite3.Database("./taller1.db", (err) => {
     );
   }
 });
+
 
 /* ---------------------- RUTAS CRUD ---------------------- */
 
