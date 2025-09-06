@@ -3,7 +3,7 @@ const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 
 const app = express();
-const PORT = process.env.PORT || 3000;   // ✅ Definido solo una vez
+const PORT = process.env.PORT || 8000;   
 
 // Middleware para parsear JSON
 app.use(express.json());
