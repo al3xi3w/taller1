@@ -3,12 +3,12 @@ const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;   // ✅ Definido solo una vez
 
-// Middlewares
+// Middleware para parsear JSON
 app.use(express.json());
 
-// DB connection (crea el archivo si no existe)
+// ---------------------- CONEXIÓN DB ----------------------
 const db = new sqlite3.Database("./database.db", (err) => {
   if (err) {
     console.error("Error al abrir la base de datos:", err.message);
@@ -26,8 +26,7 @@ const db = new sqlite3.Database("./database.db", (err) => {
   }
 });
 
-
-/* ---------------------- RUTAS CRUD ---------------------- */
+// ---------------------- RUTAS CRUD ----------------------
 
 // GET /tasks - listar todas
 app.get("/tasks", (req, res) => {
@@ -55,7 +54,13 @@ app.post("/tasks", (req, res) => {
     "INSERT INTO tasks (title, description, status, due_date) VALUES (?, ?, COALESCE(?, 'pending'), ?)";
   db.run(sql, [title, description ?? null, status ?? null, due_date ?? null], function (err) {
     if (err) return res.status(500).json({ error: err.message });
-    res.status(201).json({ id: this.lastID, title, description, status: status ?? "pending", due_date });
+    res.status(201).json({
+      id: this.lastID,
+      title,
+      description,
+      status: status ?? "pending",
+      due_date
+    });
   });
 });
 
@@ -69,21 +74,29 @@ app.put("/tasks/:id", (req, res) => {
   db.run(sql, [title, description ?? null, status ?? "pending", due_date ?? null, req.params.id], function (err) {
     if (err) return res.status(500).json({ error: err.message });
     if (this.changes === 0) return res.status(404).json({ error: "Task no encontrada" });
-    res.json({ id: Number(req.params.id), title, description, status: status ?? "pending", due_date });
+    res.json({
+      id: Number(req.params.id),
+      title,
+      description,
+      status: status ?? "pending",
+      due_date
+    });
   });
 });
 
-// PATCH /tasks/:id - actualización parcial (opcional y útil)
+// PATCH /tasks/:id - actualización parcial
 app.patch("/tasks/:id", (req, res) => {
   const fields = ["title", "description", "status", "due_date"];
   const updates = [];
   const params = [];
+
   fields.forEach((f) => {
     if (req.body[f] !== undefined) {
       updates.push(`${f} = ?`);
       params.push(req.body[f]);
     }
   });
+
   if (updates.length === 0) return res.status(400).json({ error: "Nada que actualizar" });
 
   params.push(req.params.id);
@@ -104,11 +117,7 @@ app.delete("/tasks/:id", (req, res) => {
   });
 });
 
-/* ---------------------- ARRANQUE ---------------------- */
-
-const PORT = process.env.PORT || 3000;
-
+// ---------------------- ARRANQUE ----------------------
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor corriendo en http://0.0.0.0:${PORT}`);
 });
-
